@@ -263,6 +263,7 @@ function footer(c, page) {
   </div>
   <div class="wrap site-foot__base">
     <p>© ${YEAR} ${config.name}. ${config.legalLine}. ${L.ui.rights}</p>
+    <a href="${href('privacy')}"${page.key === 'privacy' ? ' aria-current="page"' : ''}>${L.ui.privacy}</a>
     <a class="lang-link" href="${altHref}" hreflang="${alt.lang}" lang="${alt.lang}">${L.ui.langNote}</a>
   </div>
 </footer>`;
@@ -326,7 +327,6 @@ function home(c) {
       <svg class="hero__glyph" viewBox="3 3 94 94" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="9">${GLYPH.replace(/<path /g, '<path pathLength="1" ')}</g></svg>
     </div>
     <p class="hero__lead">${esc(H.lead)}</p>
-    <span class="hero__cue" aria-hidden="true"></span>
     <div class="hero__scrim"></div>
     <div class="hero__copy wrap">
       <h1 class="hero__title" id="hero-title">${esc(H.h1)}</h1>
@@ -654,6 +654,7 @@ function bookPage(c) {
     <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
     <p class="book-form__error" role="alert" hidden></p>
     <button class="btn btn--lg book-form__submit" type="submit">${F.submit}</button>
+    <p class="book-form__privacy">${esc(F.privacyNote).replace('{privacy}', `<a class="link" href="${c.href('privacy')}">${L.ui.privacy.toLowerCase()}</a>`)}</p>
   </form>
   <div class="book-sent" role="status" hidden tabindex="-1">
     ${mark('book-sent__mark')}
@@ -682,6 +683,28 @@ ${pageHero(B.h1, B.sub, '', ' page-hero--compact')}
   </div>
 </section>`;
   return page(c, { key: 'book', route: L.routes.book, title: B.metaTitle, description: B.metaDesc, crumb: L.ui.book, faq: B.faq }, body);
+}
+
+function privacyPage(c) {
+  const { L } = c;
+  const P = L.privacy;
+  const fill = (t) => esc(t)
+    .replace('{email}', `<a class="link" href="mailto:${config.email}">${config.email}</a>`)
+    .replace('{phone}', `<a class="link" href="tel:${config.phoneE164}">${config.phone}</a>`);
+  const body = `
+${pageHero(P.h1, P.sub, '', ' page-hero--compact')}
+<section class="legal">
+  <div class="wrap legal__body">
+    <p class="legal__updated">${P.updatedLabel}: ${P.updated}</p>
+    ${P.sections.map((s) => [
+      `<h2>${esc(s.h)}</h2>`,
+      ...(s.p || []).map((t) => `<p>${fill(t)}</p>`),
+      s.list ? `<ul>${s.list.map((t) => `<li>${fill(t)}</li>`).join('')}</ul>` : '',
+      ...(s.after || []).map((t) => `<p>${fill(t)}</p>`),
+    ].join('')).join('\n    ')}
+  </div>
+</section>`;
+  return page(c, { key: 'privacy', route: L.routes.privacy, title: P.metaTitle, description: P.metaDesc, crumb: L.ui.privacy }, body);
 }
 
 function notFoundPage() {
@@ -723,6 +746,7 @@ for (const L of Object.values(LANGS)) {
   write(L.routes.about, aboutPage(make('about')));
   write(L.routes.gallery, galleryPage(make('gallery')));
   write(L.routes.book, bookPage(make('book')));
+  write(L.routes.privacy, privacyPage(make('privacy')));
 }
 write('404.html', notFoundPage());
 
@@ -734,8 +758,8 @@ ${routes.flatMap((k) => [en, es].map((L) => `  <url>
     <xhtml:link rel="alternate" hreflang="en" href="${abs(en.routes[k])}"/>
     <xhtml:link rel="alternate" hreflang="es" href="${abs(es.routes[k])}"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="${abs(en.routes[k])}"/>
-    <changefreq>monthly</changefreq>
-    <priority>${k === 'home' ? '1.0' : EVENT_KEYS.includes(k) || k === 'book' ? '0.9' : '0.7'}</priority>
+    <changefreq>${k === 'privacy' ? 'yearly' : 'monthly'}</changefreq>
+    <priority>${k === 'home' ? '1.0' : EVENT_KEYS.includes(k) || k === 'book' ? '0.9' : k === 'privacy' ? '0.3' : '0.7'}</priority>
   </url>`)).join('\n')}
 </urlset>
 `;

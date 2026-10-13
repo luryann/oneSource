@@ -16,6 +16,7 @@ export default {
     about: 'about/',
     gallery: 'gallery/',
     book: 'book/',
+    privacy: 'privacy/',
   },
 
   ui: {
@@ -51,6 +52,7 @@ export default {
     ctaCall: 'Call',
     learnMore: 'details',
     langNote: 'Leer en español',
+    privacy: 'Privacy policy',
   },
 
   site: {
@@ -413,6 +415,7 @@ export default {
       errEvent: 'Choose the type of event.',
       errDate: 'Choose the date of your event.',
       errSend: 'The request did not go through. Check your connection and try again, or call us at',
+      privacyNote: 'We only use this to reply about your event. See our {privacy}.',
     },
     faq: [
       { q: 'What areas do you cover?', a: 'We are based in Los Angeles and play events across LA County and Southern California. Ask about travel for events farther out.' },
@@ -420,6 +423,81 @@ export default {
       { q: 'How do I hold my date?', a: '[Deposit placeholder. Describe how a date is reserved: deposit amount, contract and when the balance is due.]' },
       { q: 'How early do you arrive?', a: 'We arrive with enough time to set up and sound check before guests come in, and we coordinate load-in with your venue.' },
       { q: 'Do you take requests?', a: 'Yes, from you ahead of time and from guests during the event, always inside your do-not-play list.' },
+    ],
+  },
+
+  // PLACEHOLDER: have the owners review this policy against how they actually handle client info.
+  privacy: {
+    metaTitle: 'Privacy Policy | One Source Entertainment',
+    metaDesc: 'How One Source Entertainment collects, uses and protects the information you share when you contact us or book an event.',
+    h1: 'Privacy policy',
+    sub: 'What we collect when you contact us, and what we do with it.',
+    updatedLabel: 'Last updated',
+    updated: 'October 13, 2026',
+    sections: [
+      {
+        h: 'Who we are',
+        p: ['One Source Entertainment, a DJ LX & Associates company, provides DJ, MC, lighting, sound, photo booth and AV services in Los Angeles. When this policy says “we” or “us,” it means us. Questions go to {email} or {phone}.'],
+      },
+      {
+        h: 'What we collect',
+        p: ['We only collect what you choose to send us:'],
+        list: [
+          'Booking requests: your name, email, phone, event type and date, venue, guest count, preferred language, the services you want and anything you write in the message.',
+          'Calls, texts, emails and social media messages you send us, and the details we need to plan and run your event.',
+          'Contracts and payment records once you book.',
+        ],
+      },
+      {
+        h: 'What we do not collect',
+        p: ['This site does not use cookies, analytics or advertising trackers, and we do not build profiles of visitors. The company that hosts the site (GitHub Pages) and the service that delivers our fonts (Google Fonts) receive your IP address when your browser loads the page, as any website host does. They handle it under their own privacy policies.'],
+      },
+      {
+        h: 'How we use it',
+        list: [
+          'To reply with availability and a quote.',
+          'To plan your event, perform at it and follow up afterward.',
+          'To keep business, tax and contract records.',
+        ],
+        after: ['We do not add you to a mailing list or send marketing unless you ask us to.'],
+      },
+      {
+        h: 'Who we share it with',
+        p: ['We do not sell or share your personal information for advertising. We only pass it along when needed to serve you:'],
+        list: [
+          'The form service that delivers booking requests to our inbox.',
+          'The DJs and crew working your event, so they can run it.',
+          'Authorities, when the law requires it.',
+        ],
+      },
+      {
+        h: 'Event photos',
+        p: ['We sometimes photograph events and post the photos in our gallery and on Instagram. If you would rather your event not be shared, or want a photo taken down, tell us at {email} and we will remove it.'],
+      },
+      {
+        h: 'How long we keep it',
+        p: ['We keep inquiries as long as they are useful for your event, and booking records as long as business and tax rules require. Ask us to delete your information and we will, unless we have to keep it by law.'],
+      },
+      {
+        h: 'Your choices and California rights',
+        p: ['You can ask us what personal information we have about you, ask us to correct it, or ask us to delete it. California residents have these rights under the California Consumer Privacy Act. We will not treat you differently for asking. Email {email} or call {phone} and we will respond within 45 days.'],
+      },
+      {
+        h: 'Do Not Track',
+        p: ['Because this site does not track visitors, it works the same whether or not your browser sends a Do Not Track signal.'],
+      },
+      {
+        h: 'Children',
+        p: ['This site is meant for adults planning events. Quinceañeras, Sweet 16s and school dances are booked by parents, guardians or schools. We do not knowingly collect information from children under 13.'],
+      },
+      {
+        h: 'Other sites',
+        p: ['Links to Instagram, Facebook and other sites follow those sites’ own privacy policies.'],
+      },
+      {
+        h: 'Changes',
+        p: ['If we change this policy, we will post the new version here and update the date at the top.'],
+      },
     ],
   },
 

@@ -16,6 +16,7 @@ export default {
     about: 'es/nosotros/',
     gallery: 'es/galeria/',
     book: 'es/reservar/',
+    privacy: 'es/privacidad/',
   },
 
   ui: {
@@ -51,6 +52,7 @@ export default {
     ctaCall: 'Llamar al',
     learnMore: 'detalles',
     langNote: 'Read in English',
+    privacy: 'Política de privacidad',
   },
 
   site: {
@@ -402,12 +404,88 @@ export default {
       errEvent: 'Elige el tipo de evento.',
       errDate: 'Elige la fecha de tu evento.',
       errSend: 'La solicitud no se envió. Revisa tu conexión e inténtalo de nuevo, o llámanos al',
+      privacyNote: 'Solo usamos esta información para responderte sobre tu evento. Consulta nuestra {privacy}.',
     },
     faq: [
       { q: '¿Qué zonas cubren?', a: 'Estamos en Los Ángeles y tocamos en todo el condado y el sur de California. Pregunta por eventos más lejos.' },
       { q: '¿Cómo aparto mi fecha?', a: '[Texto de ejemplo sobre el depósito. Explicar cómo se aparta una fecha: monto del depósito, contrato y cuándo se paga el resto.]' },
       { q: '¿Con cuánto tiempo llegan antes?', a: 'Llegamos con tiempo para montar y probar sonido antes de que entren los invitados, y coordinamos la entrada con tu salón.' },
       { q: '¿Aceptan peticiones?', a: 'Sí, tuyas antes del evento y de los invitados durante la fiesta, siempre respetando tu lista de canciones que no.' },
+    ],
+  },
+
+  // PLACEHOLDER: los dueños deben revisar esta política según cómo manejan la información de sus clientes.
+  privacy: {
+    metaTitle: 'Política de privacidad | One Source Entertainment',
+    metaDesc: 'Cómo One Source Entertainment recopila, usa y protege la información que compartes cuando nos contactas o reservas un evento.',
+    h1: 'Política de privacidad',
+    sub: 'Qué recopilamos cuando nos contactas y qué hacemos con esa información.',
+    updatedLabel: 'Última actualización',
+    updated: '13 de octubre de 2026',
+    sections: [
+      {
+        h: 'Quiénes somos',
+        p: ['One Source Entertainment, una empresa de DJ LX & Associates, ofrece servicios de DJ, MC, iluminación, sonido, cabina de fotos y audiovisuales en Los Ángeles. Cuando esta política dice “nosotros”, se refiere a nosotros. Si tienes preguntas, escríbenos a {email} o llama al {phone}.'],
+      },
+      {
+        h: 'Qué recopilamos',
+        p: ['Solo recopilamos lo que tú decides enviarnos:'],
+        list: [
+          'Solicitudes de reserva: tu nombre, correo, teléfono, tipo y fecha del evento, lugar, número de invitados, idioma preferido, los servicios que quieres y lo que escribas en el mensaje.',
+          'Llamadas, mensajes de texto, correos y mensajes en redes sociales que nos envías, y los detalles que necesitamos para planear y realizar tu evento.',
+          'Contratos y registros de pago cuando reservas.',
+        ],
+      },
+      {
+        h: 'Qué no recopilamos',
+        p: ['Este sitio no usa cookies, analíticas ni rastreadores de publicidad, y no creamos perfiles de visitantes. La empresa que aloja el sitio (GitHub Pages) y el servicio que entrega nuestras fuentes (Google Fonts) reciben tu dirección IP cuando tu navegador carga la página, como cualquier proveedor de sitios web. Ellos la manejan según sus propias políticas de privacidad.'],
+      },
+      {
+        h: 'Cómo la usamos',
+        list: [
+          'Para responderte con disponibilidad y una cotización.',
+          'Para planear tu evento, realizarlo y darle seguimiento.',
+          'Para mantener registros comerciales, fiscales y de contratos.',
+        ],
+        after: ['No te agregamos a listas de correo ni te enviamos publicidad a menos que nos lo pidas.'],
+      },
+      {
+        h: 'Con quién la compartimos',
+        p: ['No vendemos ni compartimos tu información personal para publicidad. Solo la compartimos cuando es necesario para atenderte:'],
+        list: [
+          'El servicio de formularios que entrega las solicitudes de reserva a nuestro correo.',
+          'Los DJs y el equipo que trabajan en tu evento, para poder realizarlo.',
+          'Las autoridades, cuando la ley lo exige.',
+        ],
+      },
+      {
+        h: 'Fotos de eventos',
+        p: ['A veces tomamos fotos de los eventos y las publicamos en nuestra galería y en Instagram. Si prefieres que no compartamos tu evento, o quieres que quitemos una foto, avísanos a {email} y la eliminaremos.'],
+      },
+      {
+        h: 'Cuánto tiempo la guardamos',
+        p: ['Guardamos las consultas mientras sean útiles para tu evento, y los registros de reservas el tiempo que exigen las normas comerciales y fiscales. Si nos pides borrar tu información, lo haremos, salvo que la ley nos obligue a conservarla.'],
+      },
+      {
+        h: 'Tus opciones y derechos en California',
+        p: ['Puedes pedirnos qué información personal tenemos sobre ti, pedir que la corrijamos o que la borremos. Los residentes de California tienen estos derechos bajo la Ley de Privacidad del Consumidor de California (CCPA). No te trataremos diferente por pedirlo. Escribe a {email} o llama al {phone} y responderemos en un plazo de 45 días.'],
+      },
+      {
+        h: 'Do Not Track',
+        p: ['Como este sitio no rastrea a los visitantes, funciona igual si tu navegador envía o no una señal de Do Not Track.'],
+      },
+      {
+        h: 'Menores',
+        p: ['Este sitio está dirigido a adultos que planean eventos. Las quinceañeras, los Sweet 16 y los bailes escolares los reservan padres, tutores o escuelas. No recopilamos a sabiendas información de menores de 13 años.'],
+      },
+      {
+        h: 'Otros sitios',
+        p: ['Los enlaces a Instagram, Facebook y otros sitios se rigen por las políticas de privacidad de esos sitios.'],
+      },
+      {
+        h: 'Cambios',
+        p: ['Si cambiamos esta política, publicaremos la nueva versión aquí y actualizaremos la fecha al inicio.'],
+      },
     ],
   },
 

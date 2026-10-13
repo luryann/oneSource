@@ -93,7 +93,6 @@
         lead: el.querySelector('.hero__lead'),
         scrim: el.querySelector('.hero__scrim'),
         copy: el.querySelector('.hero__copy'),
-        cue: el.querySelector('.hero__cue'),
       });
       const r0 = Math.min(vw, vh) * 0.15;
       const rMax = Math.hypot(vw, vh) / 2 + 4;
@@ -113,7 +112,6 @@
       s.lead.style.transform = `translateY(${(-ld * 48).toFixed(1)}px)`;
       const c = easeOut(seg(p, 0.45, 0.65));
       s.scrim.style.opacity = seg(p, 0.35, 0.62).toFixed(3);
-      if (s.cue) s.cue.style.opacity = (1 - ld).toFixed(3);
       s.copy.style.opacity = c.toFixed(3);
       s.copy.style.transform = `translateY(${((1 - c) * 48).toFixed(1)}px)`;
       s.copy.style.visibility = c > 0.01 ? 'visible' : 'hidden';

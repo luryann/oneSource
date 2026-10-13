@@ -61,6 +61,7 @@ function ctx(L, key, route) {
   return { L, key, route, rel, href, asset, photo };
 }
 
+const bookHref = (c, key) => c.href('book') + (EVENT_KEYS.includes(key) ? `?event=${key}` : '');
 const svc = (L, k) => L.services.find((s) => s.key === k);
 const ev = (L, k) => L.events.find((e) => e.key === k);
 const words = (s) => s.split(' ').map((w) => `<span class="w">${esc(w)}</span>`).join(' ');
@@ -190,7 +191,7 @@ function header(c, page) {
   return `<a class="skip" href="#main">${L.ui.skip}</a>
 <header class="site-head" data-head>
   <div class="site-head__bar">
-    <a class="brand" href="${href('home')}" aria-label="${config.name}, ${L.ui.home}">${mark('brand__mark')}<img class="brand__word" src="${c.asset('img/wordmark.png')}" alt="" width="922" height="159"></a>
+    <a class="brand" href="${href('home')}" aria-label="${config.name}, ${L.ui.home}">${mark('brand__mark')}<img class="brand__word brand__word--light" src="${c.asset('img/wordmark.png')}" alt="" width="922" height="159"><img class="brand__word brand__word--dark" src="${c.asset('img/wordmark-dark.png')}" alt="" width="922" height="159"></a>
     <nav class="nav" aria-label="${L.ui.navLabel}">
       <ul class="nav__list">
         <li><button class="nav__link nav__trigger" type="button" aria-expanded="false" aria-controls="nav-events"${EVENT_KEYS.includes(page.key) ? ' data-current' : ''}>${L.ui.events}<svg class="nav__chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button></li>
@@ -201,7 +202,8 @@ function header(c, page) {
     </nav>
     <div class="site-head__actions">
       <a class="lang-link" href="${altHref}" hreflang="${alt.lang}" lang="${alt.lang}">${L.otherLabel}</a>
-      <a class="btn btn--sm site-head__book" href="${href('book')}">${L.ui.book}</a>
+      <a class="tel-btn" href="tel:${config.phoneE164}" aria-label="${L.ui.call} ${config.phone}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" fill="currentColor"/></svg></a>
+      <a class="btn btn--sm site-head__book" href="${bookHref(c, page.key)}"${cur('book')}>${L.ui.book}</a>
       <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu"><span class="menu-btn__lines" aria-hidden="true"></span><span class="sr-only" data-open="${L.ui.menu}" data-close="${L.ui.close}">${L.ui.menu}</span></button>
     </div>
   </div>
@@ -233,7 +235,7 @@ function footer(c, page) {
   return `<footer class="site-foot">
   <div class="wrap site-foot__grid">
     <div class="site-foot__brand">
-      <a href="${href('home')}" aria-label="${config.name}, ${L.ui.home}"><img src="${c.asset('img/wordmark-full.png')}" alt="${config.name}, ${config.legalLine}" width="923" height="211" loading="lazy"></a>
+      <a href="${href('home')}" aria-label="${config.name}, ${L.ui.home}"><img src="${c.asset('img/wordmark-full-dark.png')}" alt="${config.name}, ${config.legalLine}" width="923" height="211" loading="lazy"></a>
       <p>${L.ui.footerTag}</p>
     </div>
     <nav class="site-foot__col" aria-labelledby="f-events">
@@ -266,15 +268,15 @@ function footer(c, page) {
 </footer>`;
 }
 
-function cta(c) {
-  const { L, href } = c;
+function cta(c, key) {
+  const { L } = c;
   return `<section class="cta" aria-labelledby="cta-title">
   <div class="wrap cta__inner">
     ${mark('cta__mark')}
     <h2 class="cta__title" id="cta-title" data-reveal>${L.ui.ctaTitle}</h2>
     <p class="cta__text" data-reveal>${L.ui.ctaText}</p>
     <div class="cta__actions" data-reveal>
-      <a class="btn btn--lg" href="${href('book')}">${L.ui.book}</a>
+      <a class="btn btn--lg" href="${bookHref(c, key)}">${L.ui.book}</a>
       <a class="btn btn--lg btn--ghost" href="tel:${config.phoneE164}">${L.ui.ctaCall} ${config.phone}</a>
     </div>
   </div>
@@ -298,8 +300,8 @@ ${footer(c, meta)}
 const faqList = (items) =>
   items.map((f) => `<details class="faq__item"><summary>${esc(f.q)}</summary><div class="faq__a"><p>${esc(f.a)}</p></div></details>`).join('');
 
-function pageHero(h1, sub, extra = '') {
-  return `<section class="page-hero">
+function pageHero(h1, sub, extra = '', mod = '') {
+  return `<section class="page-hero${mod}">
   <div class="wrap">
     <h1 class="page-hero__title">${esc(h1)}</h1>
     <p class="page-hero__sub">${esc(sub)}</p>
@@ -324,6 +326,7 @@ function home(c) {
       <svg class="hero__glyph" viewBox="3 3 94 94" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="9">${GLYPH.replace(/<path /g, '<path pathLength="1" ')}</g></svg>
     </div>
     <p class="hero__lead">${esc(H.lead)}</p>
+    <span class="hero__cue" aria-hidden="true"></span>
     <div class="hero__scrim"></div>
     <div class="hero__copy wrap">
       <h1 class="hero__title" id="hero-title">${esc(H.h1)}</h1>
@@ -338,7 +341,7 @@ function home(c) {
 
 <section class="statement" data-scene="words">
   <div class="statement__stage">
-    <p class="statement__text wrap">${words(H.statement)}</p>
+    <div class="wrap"><p class="statement__text">${words(H.statement)}</p></div>
   </div>
 </section>
 
@@ -368,7 +371,7 @@ function home(c) {
       <ul class="events__track" data-track>
         ${L.events.map((e) => `<li class="ev-card">
           <a class="ev-card__link" href="${href(e.key)}">
-            ${photo(e.img, e.alt, { cls: 'ev-card__img' })}
+            ${photo(e.img, e.alt, { cls: 'ev-card__img', eager: true })}
             <span class="ev-card__body">
               <span class="ev-card__name">${esc(e.name)}</span>
               <span class="ev-card__text">${esc(e.card)}</span>
@@ -428,7 +431,7 @@ function eventPage(c, e) {
     <div class="ev-hero__copy wrap">
       <h1 class="ev-hero__title" id="ev-title">${esc(e.h1)}</h1>
       <p class="ev-hero__sub">${esc(e.sub)}</p>
-      <a class="btn btn--lg" href="${href('book')}">${L.ui.book}</a>
+      <a class="btn btn--lg" href="${bookHref(c, e.key)}">${L.ui.book}</a>
     </div>
   </div>
 </section>
@@ -486,7 +489,7 @@ function eventPage(c, e) {
     </ul>
   </div>
 </section>
-${cta(c)}`;
+${cta(c, e.key)}`;
   return page(c, {
     key: e.key,
     route: L.routes[e.key],
@@ -510,7 +513,7 @@ ${cta(c)}`;
 function servicesPage(c) {
   const { L, href, photo } = c;
   const P = L.servicesPage;
-  const jump = `<ul class="jump">${L.services.map((s) => `<li><a href="#${s.key}">${esc(s.name)}</a></li>`).join('')}<li><a href="#pricing">${esc(L.packages.title)}</a></li></ul>`;
+  const jump = `<ul class="jump"><li><a class="jump__primary" href="#pricing">${esc(L.packages.title)}</a></li>${L.services.map((s) => `<li><a href="#${s.key}">${esc(s.name)}</a></li>`).join('')}</ul>`;
   const body = `
 ${pageHero(P.h1, P.sub, `<nav aria-label="${L.ui.servicesLabel}">${jump}</nav>`)}
 <section class="svc-rows">
@@ -625,7 +628,7 @@ function bookPage(c) {
     </div>
     <div class="book-form__row">
       ${field('phone', `${F.phone} ${req}`, `<input id="f-phone" name="phone" type="tel" autocomplete="tel" required ${desc('phone')}>`)}
-      ${field('event', `${F.event} ${req}`, `<select id="f-event" name="event_type" required ${desc('event')}><option value="">${F.eventChoose}</option>${L.events.map((e) => `<option>${esc(e.name)}</option>`).join('')}<option>${F.eventOther}</option></select>`)}
+      ${field('event', `${F.event} ${req}`, `<select id="f-event" name="event_type" required ${desc('event')}><option value="">${F.eventChoose}</option>${L.events.map((e) => `<option value="${esc(e.name)}" data-key="${e.key}">${esc(e.name)}</option>`).join('')}<option>${F.eventOther}</option></select>`)}
     </div>
     <div class="book-form__row">
       ${field('date', `${F.date} ${req}`, `<input id="f-date" name="event_date" type="date" required ${desc('date')}>`)}
@@ -659,7 +662,7 @@ function bookPage(c) {
     <button class="btn btn--outline" type="button" data-reset>${F.sentAgain}</button>
   </div>`;
   const body = `
-${pageHero(B.h1, B.sub)}
+${pageHero(B.h1, B.sub, '', ' page-hero--compact')}
 <section class="book">
   <div class="wrap book__grid">
     <div class="book__main">${form}</div>

@@ -8,6 +8,7 @@
   const easeOut = (t) => 1 - Math.pow(1 - t, 3);
 
   /* ---------- header: events panel + mobile menu ---------- */
+  const head = document.querySelector('[data-head]');
   const trigger = document.querySelector('.nav__trigger');
   const panel = document.getElementById('nav-events');
   const menuBtn = document.querySelector('.menu-btn');
@@ -17,6 +18,7 @@
     if (!trigger) return;
     trigger.setAttribute('aria-expanded', String(open));
     panel.hidden = !open;
+    head.classList.toggle('is-open', open || menuBtn?.getAttribute('aria-expanded') === 'true');
   };
   trigger?.addEventListener('click', () => setPanel(trigger.getAttribute('aria-expanded') !== 'true'));
 
@@ -24,6 +26,7 @@
     menuBtn.setAttribute('aria-expanded', String(open));
     menu.hidden = !open;
     document.body.classList.toggle('menu-open', open);
+    head.classList.toggle('is-open', open);
     const label = menuBtn.querySelector('.sr-only');
     label.textContent = open ? label.dataset.close : label.dataset.open;
     if (open) menu.querySelector('a')?.focus();
@@ -39,6 +42,33 @@
     if (trigger?.getAttribute('aria-expanded') === 'true' && !e.target.closest('.nav-panel, .nav__trigger')) setPanel(false);
   });
   matchMedia('(min-width: 1081px)').addEventListener('change', (m) => { if (m.matches && menuBtn) setMenu(false); });
+
+  /* ---------- header theme: light over light sections ---------- */
+  const headH = () => parseFloat(getComputedStyle(root).getPropertyValue('--head-h')) || 64;
+  const isLight = (el) => {
+    for (let n = el; n && n !== document.body; n = n.parentElement) {
+      const bg = getComputedStyle(n).backgroundColor;
+      const m = bg.match(/[\d.]+/g);
+      if (!m || (m[3] !== undefined && +m[3] < 0.5)) continue;
+      return 0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2] > 160;
+    }
+    return false;
+  };
+  let headTick = false;
+  const updateHead = () => {
+    headTick = false;
+    const y = headH() + 2;
+    const prev = head.style.pointerEvents;
+    head.style.pointerEvents = 'none';
+    const el = document.elementFromPoint(innerWidth / 2, y);
+    head.style.pointerEvents = prev;
+    head.classList.toggle('is-light', !!el && isLight(el));
+  };
+  if (head) {
+    addEventListener('scroll', () => { if (!headTick) { headTick = true; requestAnimationFrame(updateHead); } }, { passive: true });
+    addEventListener('resize', updateHead);
+    updateHead();
+  }
 
   /* ---------- scroll scenes ---------- */
   const scenes = [...document.querySelectorAll('[data-scene]')];
@@ -63,10 +93,11 @@
         lead: el.querySelector('.hero__lead'),
         scrim: el.querySelector('.hero__scrim'),
         copy: el.querySelector('.hero__copy'),
+        cue: el.querySelector('.hero__cue'),
       });
       const r0 = Math.min(vw, vh) * 0.15;
       const rMax = Math.hypot(vw, vh) / 2 + 4;
-      const g = ease(seg(p, 0.03, 0.62));
+      const g = ease(seg(p, 0.02, 0.5));
       const r = r0 + (rMax - r0) * g;
       s.portal.style.clipPath = `circle(${r.toFixed(1)}px at 50% 50%)`;
       s.photo.style.transform = `scale(${(1.25 - 0.25 * g).toFixed(4)})`;
@@ -80,8 +111,9 @@
       const ld = seg(p, 0, 0.1);
       s.lead.style.opacity = (1 - ld).toFixed(3);
       s.lead.style.transform = `translateY(${(-ld * 48).toFixed(1)}px)`;
-      const c = easeOut(seg(p, 0.6, 0.8));
-      s.scrim.style.opacity = seg(p, 0.45, 0.78).toFixed(3);
+      const c = easeOut(seg(p, 0.45, 0.65));
+      s.scrim.style.opacity = seg(p, 0.35, 0.62).toFixed(3);
+      if (s.cue) s.cue.style.opacity = (1 - ld).toFixed(3);
       s.copy.style.opacity = c.toFixed(3);
       s.copy.style.transform = `translateY(${((1 - c) * 48).toFixed(1)}px)`;
       s.copy.style.visibility = c > 0.01 ? 'visible' : 'hidden';
@@ -104,7 +136,7 @@
       const s = (el._s ||= { media: el.querySelector('.ev-hero__media'), img: el.querySelector('.ev-hero__img'), copy: el.querySelector('.ev-hero__copy') });
       const e = ease(seg(p, 0, 0.6));
       const k = 1 - e;
-      const head = 64;
+      const head = headH();
       s.media.style.clipPath = `inset(${(k * (head + vh * 0.03)).toFixed(1)}px ${(k * vw * 0.05).toFixed(1)}px ${(k * vh * 0.06).toFixed(1)}px round ${(k * 28).toFixed(1)}px)`;
       s.img.style.transform = `scale(${(1.12 - 0.12 * e).toFixed(4)})`;
       s.copy.style.transform = `translateY(${(-seg(p, 0.5, 1) * 40).toFixed(1)}px)`;
@@ -170,7 +202,7 @@
   if (motion && 'IntersectionObserver' in window) {
     const io = new IntersectionObserver((entries) => {
       for (const en of entries) if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
-    }, { rootMargin: '0px 0px -12% 0px' });
+    }, { rootMargin: '0px 0px -8% 0px' });
     reveals.forEach((el) => io.observe(el));
   }
 
@@ -227,6 +259,9 @@
     const submit = form.querySelector('.book-form__submit');
     const formError = form.querySelector('.book-form__error');
     const label = submit.textContent;
+    const pre = new URLSearchParams(location.search).get('event');
+    const opt = pre && form.querySelector(`#f-event option[data-key="${CSS.escape(pre)}"]`);
+    if (opt) opt.selected = true;
     const rules = {
       name: (v) => v.trim().length > 1,
       email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()),

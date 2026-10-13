@@ -1,0 +1,9 @@
+{
+  "name": "onesource-entertainment",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node src/build.mjs",
+    "preview": "npx --yes serve docs -l 4173"
+  }
+}

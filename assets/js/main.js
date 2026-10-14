@@ -74,6 +74,14 @@
   const scenes = [...document.querySelectorAll('[data-scene]')];
   const parallax = [...document.querySelectorAll('[data-parallax]')];
   const nights = [...document.querySelectorAll('[data-night]')];
+  const reads = [...document.querySelectorAll('[data-read]')].map((el) => ({ el, w: [...el.querySelectorAll('.w')], lit: -1 }));
+  const powers = [...document.querySelectorAll('[data-on]')];
+  const opens = [...document.querySelectorAll('[data-open]')];
+  const stacks = [...document.querySelectorAll('[data-stack]')];
+  const lights = [...document.querySelectorAll('.gallery__btn')];
+  const seqs = [...document.querySelectorAll('[data-seq]')];
+  const years = [...document.querySelectorAll('[data-count]')].map((el, i, all) => ({ el, to: +el.dataset.count, from: i ? +all[i - 1].dataset.count : +el.dataset.count, shown: null }));
+  const wide = matchMedia('(min-width: 961px)');
   let vw = innerWidth, vh = innerHeight;
 
   const progress = (el) => {
@@ -170,6 +178,87 @@
     }
   };
 
+  // 0 when the element's top sits at `from` (fraction of viewport height), 1 when it reaches `to`
+  const enter = (r, from, to) => clamp((vh * from - r.top) / (vh * (from - to)));
+  const inView = (r) => r.bottom > -100 && r.top < vh + 100;
+
+  // paragraphs light up word by word as they pass through the reading line
+  const updateReads = () => {
+    for (const s of reads) {
+      // measure the words, not the element: grid cells can stretch far past the text
+      const top = s.w[0].getBoundingClientRect().top;
+      const bottom = s.w[s.w.length - 1].getBoundingClientRect().bottom;
+      if (bottom < -100 || top > vh + 100) continue;
+      const n = Math.round(clamp((vh * 0.85 - top) / (vh * 0.35 + bottom - top)) * s.w.length);
+      if (n === s.lit) continue;
+      s.w.forEach((w, i) => w.classList.toggle('is-lit', i < n));
+      s.lit = n;
+    }
+  };
+
+  // rows switch on one at a time, like gear powering up during setup
+  const updatePowers = () => {
+    for (const el of powers) {
+      const r = el.getBoundingClientRect();
+      if (inView(r)) el.style.setProperty('--on', easeOut(enter(r, 0.88, 0.6)).toFixed(3));
+    }
+  };
+
+  // photo frames open out from a smaller window as they arrive
+  const updateOpens = () => {
+    for (const el of opens) {
+      const r = el.getBoundingClientRect();
+      if (!inView(r)) continue;
+      const k = 1 - ease(enter(r, 1, 0.4));
+      el.style.clipPath = `inset(${(k * 9).toFixed(2)}% ${(k * 11).toFixed(2)}% round 28px)`;
+    }
+  };
+
+  // each pricing tier slides out from behind the one it builds on
+  const updateStacks = () => {
+    for (const el of stacks) {
+      const cards = el.children;
+      if (!wide.matches) { for (const c of cards) c.style.transform = ''; continue; }
+      const r = el.getBoundingClientRect();
+      if (!inView(r)) continue;
+      const p = enter(r, 0.95, 0.4);
+      const step = cards[1].offsetLeft - cards[0].offsetLeft;
+      const a = 1 - ease(seg(p, 0, 0.6));
+      const b = 1 - ease(seg(p, 0.3, 1));
+      cards[1].style.transform = `translate3d(${(-step * a).toFixed(1)}px,0,0)`;
+      cards[2].style.transform = `translate3d(${(-step * (a + b)).toFixed(1)}px,0,0)`;
+    }
+  };
+
+  // gallery: house lights come up on each photo as it scrolls in
+  const updateLights = () => {
+    for (const el of lights) {
+      const r = el.getBoundingClientRect();
+      if (inView(r)) el.style.setProperty('--dark', (0.75 * (1 - enter(r, 1, 0.72))).toFixed(3));
+    }
+  };
+
+  // steps fill in order as the list scrolls through
+  const updateSeqs = () => {
+    for (const el of seqs) {
+      const r = el.getBoundingClientRect();
+      if (!inView(r)) continue;
+      const p = clamp((vh * 0.85 - r.top) / (vh * 0.4 + r.height * 0.6));
+      const n = el.children.length;
+      [...el.children].forEach((c, i) => c.style.setProperty('--on', ease(seg(p, i / n, (i + 1) / n)).toFixed(3)));
+    }
+  };
+
+  // timeline years count from the previous milestone as their row scrolls up
+  const updateYears = () => {
+    for (const y of years) {
+      const r = y.el.getBoundingClientRect();
+      if (!inView(r)) continue;
+      const v = Math.round(y.from + (y.to - y.from) * easeOut(enter(r, 0.9, 0.5)));
+      if (v !== y.shown) y.el.textContent = y.shown = v;
+    }
+  };
+
   let ticking = false;
   const frame = () => {
     ticking = false;
@@ -179,6 +268,13 @@
     }
     updateParallax();
     updateNights();
+    updateReads();
+    updatePowers();
+    updateOpens();
+    updateStacks();
+    updateLights();
+    updateSeqs();
+    updateYears();
   };
   const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
 
@@ -193,15 +289,6 @@
       request();
     });
     addEventListener('load', () => { sizeTracks(); request(); });
-  }
-
-  /* ---------- reveal on enter ---------- */
-  const reveals = document.querySelectorAll('[data-reveal]');
-  if (motion && 'IntersectionObserver' in window) {
-    const io = new IntersectionObserver((entries) => {
-      for (const en of entries) if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
-    }, { rootMargin: '0px 0px -8% 0px' });
-    reveals.forEach((el) => io.observe(el));
   }
 
   /* ---------- one source list: active service follows scroll ---------- */
@@ -226,12 +313,21 @@
     chips.forEach((chip) => chip.addEventListener('click', () => {
       const f = chip.dataset.filter;
       chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
-      gallery.querySelectorAll('.gallery__item').forEach((it) => {
+      const all = [...gallery.querySelectorAll('.gallery__item')];
+      const before = new Map(all.filter((it) => !it.hidden).map((it) => [it, it.getBoundingClientRect()]));
+      all.forEach((it) => {
         const show = f === 'all' || it.dataset.ev === f;
-        const was = !it.hidden;
         it.hidden = !show;
-        it.classList.toggle('is-entering', show && !was);
       });
+      // photos that stay glide from their old spot to the new one
+      if (motion) for (const [it, a] of before) {
+        if (it.hidden) continue;
+        const b = it.getBoundingClientRect();
+        const dx = a.left - b.left, dy = a.top - b.top;
+        if (Math.abs(dx) + Math.abs(dy) < 1) continue;
+        it.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' });
+      }
+      request();
     }));
 
     const box = document.querySelector('.lightbox');

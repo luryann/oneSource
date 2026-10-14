@@ -274,9 +274,9 @@ function cta(c, key) {
   return `<section class="cta" aria-labelledby="cta-title">
   <div class="wrap cta__inner">
     ${mark('cta__mark')}
-    <h2 class="cta__title" id="cta-title" data-reveal>${L.ui.ctaTitle}</h2>
-    <p class="cta__text" data-reveal>${L.ui.ctaText}</p>
-    <div class="cta__actions" data-reveal>
+    <h2 class="cta__title" id="cta-title" data-read>${words(L.ui.ctaTitle)}</h2>
+    <p class="cta__text">${L.ui.ctaText}</p>
+    <div class="cta__actions">
       <a class="btn btn--lg" href="${bookHref(c, key)}">${L.ui.book}</a>
       <a class="btn btn--lg btn--ghost" href="tel:${config.phoneE164}">${L.ui.ctaCall} ${config.phone}</a>
     </div>
@@ -347,7 +347,7 @@ function home(c) {
 
 <section class="source" aria-labelledby="source-title">
   <div class="wrap">
-    <h2 class="h-section source__title" id="source-title" data-reveal>${esc(H.servicesTitle)}</h2>
+    <h2 class="h-section source__title" id="source-title" data-read>${words(H.servicesTitle)}</h2>
     <div class="source__grid">
       <div class="source__media" aria-hidden="true">
         ${L.services.map((s, i) => photo(s.img, '', { cls: 'source__img' + (i === 0 ? ' is-active' : ''), attrs: `data-source-img="${s.key}"` })).join('\n        ')}
@@ -386,12 +386,12 @@ function home(c) {
 <section class="team" aria-labelledby="team-title">
   <div class="wrap">
     <div class="team__head">
-      <h2 class="h-section" id="team-title" data-reveal>${esc(H.teamTitle)}</h2>
+      <h2 class="h-section" id="team-title" data-read>${words(H.teamTitle)}</h2>
       <a class="link" href="${href('about')}">${esc(H.teamLink)}</a>
     </div>
     <div class="team__grid">
-      ${L.team.map((t, i) => `<article class="person" data-reveal style="--d:${i * 120}ms">
-        <div class="person__frame">${photo(t.img, t.alt, { cls: 'person__img', attrs: 'data-parallax' })}</div>
+      ${L.team.map((t, i) => `<article class="person">
+        <div class="person__frame" data-open>${photo(t.img, t.alt, { cls: 'person__img', attrs: 'data-parallax' })}</div>
         <h3 class="person__name">${esc(t.name)}</h3>
         <p class="person__dj">${esc(t.dj)}</p>
         <p class="person__text">${esc(t.short)}</p>
@@ -402,18 +402,18 @@ function home(c) {
 ${config.showReviews ? `
 <section class="reviews" aria-labelledby="reviews-title">
   <div class="wrap">
-    <h2 class="h-section" id="reviews-title" data-reveal>${esc(H.reviewsTitle)}</h2>
+    <h2 class="h-section" id="reviews-title" data-read>${words(H.reviewsTitle)}</h2>
     <div class="reviews__list">
-      ${L.reviews.map((r, i) => `<figure class="review" data-reveal style="--d:${i * 100}ms"><blockquote><p>${esc(r.q)}</p></blockquote><figcaption><span class="review__who">${esc(r.who)}</span> <span class="review__ev">${esc(r.ev)}</span></figcaption></figure>`).join('\n      ')}
+      ${L.reviews.map((r, i) => `<figure class="review"><blockquote><p data-read>${words(r.q)}</p></blockquote><figcaption><span class="review__who">${esc(r.who)}</span> <span class="review__ev">${esc(r.ev)}</span></figcaption></figure>`).join('\n      ')}
     </div>
   </div>
 </section>` : ''}
 
 <section class="steps" aria-labelledby="steps-title">
   <div class="wrap">
-    <h2 class="h-section" id="steps-title" data-reveal>${esc(H.stepsTitle)}</h2>
-    <ol class="steps__list">
-      ${H.steps.map((s, i) => `<li class="step" data-reveal style="--d:${i * 120}ms"><span class="step__n" aria-hidden="true">${i + 1}</span><h3 class="step__t">${esc(s.t)}</h3><p class="step__d">${esc(s.d)}</p></li>`).join('\n      ')}
+    <h2 class="h-section" id="steps-title" data-read>${words(H.stepsTitle)}</h2>
+    <ol class="steps__list" data-seq>
+      ${H.steps.map((s, i) => `<li class="step"><span class="step__n" aria-hidden="true">${i + 1}</span><h3 class="step__t">${esc(s.t)}</h3><p class="step__d">${esc(s.d)}</p></li>`).join('\n      ')}
     </ol>
   </div>
 </section>
@@ -438,16 +438,16 @@ function eventPage(c, e) {
 
 <section class="intro">
   <div class="wrap intro__grid">
-    <p class="intro__lead" data-reveal>${esc(e.intro[0])}</p>
-    <p class="intro__text" data-reveal style="--d:120ms">${esc(e.intro[1])}</p>
+    <p class="intro__lead" data-read>${words(e.intro[0])}</p>
+    <p class="intro__text">${esc(e.intro[1])}</p>
   </div>
 </section>
 
 <section class="included" aria-labelledby="inc-title">
   <div class="wrap">
-    <h2 class="h-section" id="inc-title" data-reveal>${L.ui.includedTitle}</h2>
+    <h2 class="h-section" id="inc-title" data-read>${words(L.ui.includedTitle)}</h2>
     <ul class="included__list">
-      ${e.included.map((k) => { const s = svc(L, k); return `<li class="included__row" data-reveal><h3 class="included__name">${esc(s.name)}</h3><p class="included__text">${esc(s.short)}</p></li>`; }).join('\n      ')}
+      ${e.included.map((k) => { const s = svc(L, k); return `<li class="included__row" data-on><h3 class="included__name">${esc(s.name)}</h3><p class="included__text">${esc(s.short)}</p></li>`; }).join('\n      ')}
     </ul>
     <a class="link" href="${href('services')}">${L.ui.allServices}</a>
   </div>
@@ -455,7 +455,7 @@ function eventPage(c, e) {
 
 <section class="night" aria-labelledby="night-title">
   <div class="wrap night__grid">
-    <h2 class="h-section night__title" id="night-title">${L.ui.nightTitle}</h2>
+    <h2 class="h-section night__title" id="night-title" data-read>${words(L.ui.nightTitle)}</h2>
     <div class="night__body" data-night>
       <div class="night__rail" aria-hidden="true"><span class="night__fill"></span></div>
       <ol class="night__list">
@@ -476,7 +476,7 @@ function eventPage(c, e) {
 
 <section class="faq" aria-labelledby="faq-title">
   <div class="wrap faq__grid">
-    <h2 class="h-section" id="faq-title">${L.ui.faqTitle}</h2>
+    <h2 class="h-section" id="faq-title" data-read>${words(L.ui.faqTitle)}</h2>
     <div class="faq__list">${faqList(e.faq)}</div>
   </div>
 </section>
@@ -519,8 +519,8 @@ ${pageHero(P.h1, P.sub, `<nav aria-label="${L.ui.servicesLabel}">${jump}</nav>`)
 <section class="svc-rows">
   <div class="wrap">
     ${L.services.map((s, i) => `<article class="svc${i % 2 ? ' svc--flip' : ''}" id="${s.key}">
-      <div class="svc__frame">${photo(s.img, s.alt, { cls: 'svc__img', attrs: 'data-parallax' })}</div>
-      <div class="svc__copy" data-reveal>
+      <div class="svc__frame" data-open>${photo(s.img, s.alt, { cls: 'svc__img', attrs: 'data-parallax' })}</div>
+      <div class="svc__copy">
         <h2 class="svc__name">${esc(s.name)}</h2>
         <p class="svc__short">${esc(s.short)}</p>
         <p class="svc__long">${esc(s.long)}</p>
@@ -532,11 +532,11 @@ ${pageHero(P.h1, P.sub, `<nav aria-label="${L.ui.servicesLabel}">${jump}</nav>`)
 <section class="packages" id="pricing" aria-labelledby="pricing-title">
   <div class="wrap">
     <div class="packages__head">
-      <h2 class="h-section" id="pricing-title" data-reveal>${esc(L.packages.title)}</h2>
-      <p class="packages__text" data-reveal>${esc(L.packages.text)}</p>
+      <h2 class="h-section" id="pricing-title" data-read>${words(L.packages.title)}</h2>
+      <p class="packages__text">${esc(L.packages.text)}</p>
     </div>
-    <div class="packages__grid">
-      ${L.packages.items.map((p, i) => `<article class="pkg" data-reveal style="--d:${i * 100}ms">
+    <div class="packages__grid" data-stack>
+      ${L.packages.items.map((p, i) => `<article class="pkg">
         <h3 class="pkg__name">${esc(p.name)}</h3>
         <p class="pkg__for">${esc(p.for)}</p>
         <p class="pkg__price">${esc(L.packages.price)}</p>
@@ -557,28 +557,28 @@ function aboutPage(c) {
 ${pageHero(A.h1, A.sub)}
 <section class="story" aria-labelledby="story-title">
   <div class="wrap story__grid">
-    <h2 class="h-section" id="story-title" data-reveal>${esc(A.storyTitle)}</h2>
+    <h2 class="h-section" id="story-title" data-read>${words(A.storyTitle)}</h2>
     <div>
       <ol class="story__list">
-        ${A.timeline.map((t) => `<li class="story__row" data-reveal><span class="story__year">${esc(t.y)}</span><p class="story__text">${esc(t.t)}</p></li>`).join('\n        ')}
+        ${A.timeline.map((t) => `<li class="story__row" data-on><span class="story__year"${/^\d{4}$/.test(t.y) ? ` data-count="${t.y}"` : ''}>${esc(t.y)}</span><p class="story__text">${esc(t.t)}</p></li>`).join('\n        ')}
       </ol>
-      <p class="story__family" data-reveal>${esc(A.family)}</p>
+      <p class="story__family" data-read>${words(A.family)}</p>
     </div>
   </div>
 </section>
 
 <section class="crew" aria-labelledby="crew-title">
   <div class="wrap">
-    <h2 class="h-section" id="crew-title" data-reveal>${esc(A.teamTitle)}</h2>
+    <h2 class="h-section" id="crew-title" data-read>${words(A.teamTitle)}</h2>
     ${L.team.map((t, i) => `<article class="crew__row${i % 2 ? ' crew__row--flip' : ''}">
-      <div class="crew__frame">${photo(t.img, t.alt, { cls: 'crew__img', attrs: 'data-parallax' })}</div>
-      <div class="crew__copy" data-reveal>
+      <div class="crew__frame" data-open>${photo(t.img, t.alt, { cls: 'crew__img', attrs: 'data-parallax' })}</div>
+      <div class="crew__copy">
         <h3 class="crew__name">${esc(t.name)}</h3>
         <p class="crew__dj">${esc(t.dj)}</p>
         <p class="crew__bio">${esc(t.bio)}</p>
       </div>
     </article>`).join('\n    ')}
-    <p class="crew__assoc" data-reveal>${esc(A.associates)}</p>
+    <p class="crew__assoc" data-read>${words(A.associates)}</p>
   </div>
 </section>
 ${cta(c)}`;
@@ -678,7 +678,7 @@ ${pageHero(B.h1, B.sub, '', ' page-hero--compact')}
 </section>
 <section class="faq faq--paper" aria-labelledby="faq-title">
   <div class="wrap faq__grid">
-    <h2 class="h-section" id="faq-title">${L.ui.faqTitle}</h2>
+    <h2 class="h-section" id="faq-title" data-read>${words(L.ui.faqTitle)}</h2>
     <div class="faq__list">${faqList(B.faq)}</div>
   </div>
 </section>`;

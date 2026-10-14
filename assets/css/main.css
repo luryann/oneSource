@@ -364,7 +364,7 @@ body.menu-open { overflow: hidden; }
 }
 .motion .hero__lead {
   display: block; position: absolute; left: 0; right: 0;
-  top: calc(50% + 15vmin + clamp(28px, 5vh, 56px));
+  top: calc(50% + 15vmin + clamp(40px, 7vh, 80px));
   padding-inline: var(--gutter);
   text-align: center;
   font-size: clamp(1.625rem, 1rem + 2.4vw, 3rem);

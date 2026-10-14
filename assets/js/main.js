@@ -120,7 +120,8 @@
       tint: { opacity: (1 - seg(p, 0.06, 0.4)).toFixed(3) },
       ring: { transform: `scale(${(r / r0).toFixed(4)})`, opacity: (1 - seg(p, 0.04, 0.28)).toFixed(3) },
       glyph: { transform: `scale(${(1 + gl * 0.5).toFixed(3)})`, opacity: (1 - gl).toFixed(3) },
-      lead: { transform: `translateY(${(-ld * 48).toFixed(1)}px)`, opacity: (1 - ld).toFixed(3) },
+      // the lead rides down with the disc's edge so the gap under the button never closes
+      lead: { transform: `translateY(${(r - r0 + ld * 24).toFixed(1)}px)`, opacity: (1 - ld).toFixed(3) },
       scrim: { opacity: seg(p, 0.35, 0.62).toFixed(3) },
       copy: { transform: `translateY(${((1 - c) * 48).toFixed(1)}px)`, opacity: c.toFixed(3), visibility: c > 0.01 ? 'visible' : 'hidden' },
     };

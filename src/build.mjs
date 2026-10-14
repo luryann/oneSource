@@ -326,7 +326,7 @@ function home(c) {
       <svg class="hero__ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48.5" pathLength="1"/></svg>
       <svg class="hero__glyph" viewBox="3 3 94 94" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="9">${GLYPH.replace(/<path /g, '<path pathLength="1" ')}</g></svg>
     </div>
-    <p class="hero__lead">${esc(H.lead)}</p>
+    <p class="hero__lead"><span>${esc(H.lead)}</span></p>
     <div class="hero__scrim"></div>
     <div class="hero__copy wrap">
       <h1 class="hero__title" id="hero-title">${esc(H.h1)}</h1>

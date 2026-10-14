@@ -76,7 +76,7 @@
   const nights = [...document.querySelectorAll('[data-night]')];
   const reads = [...document.querySelectorAll('[data-read]')].map((el) => ({ el, w: [...el.querySelectorAll('.w')], lit: -1 }));
   const powers = [...document.querySelectorAll('[data-on]')];
-  const opens = [...document.querySelectorAll('[data-open]')];
+  const opens = [...document.querySelectorAll('[data-open]:not([data-close])')];
   const stacks = [...document.querySelectorAll('[data-stack]')];
   const lights = [...document.querySelectorAll('.gallery__btn')];
   const seqs = [...document.querySelectorAll('[data-seq]')];
@@ -90,39 +90,72 @@
     return { p: dist > 0 ? clamp(-r.top / dist) : 0, visible: r.bottom > 0 && r.top < vh };
   };
 
+  // the hero as a pure function of scroll progress, so it can be baked into a scroll timeline
+  const heroParts = (el) => (el._s ||= {
+    portal: el.querySelector('.hero__portal'),
+    photo: el.querySelector('.hero__photo'),
+    tint: el.querySelector('.hero__tint'),
+    ring: el.querySelector('.hero__ring'),
+    glyph: el.querySelector('.hero__glyph'),
+    lead: el.querySelector('.hero__lead'),
+    scrim: el.querySelector('.hero__scrim'),
+    copy: el.querySelector('.hero__copy'),
+    half: 0,
+  });
+  const heroAt = (p, s) => {
+    // measure the stage (100lvh) rather than innerHeight, which shifts as mobile toolbars slide
+    if (s.vw !== vw) { s.vw = vw; s.h = s.portal.parentElement.parentElement.offsetHeight || vh; s.half = s.portal.offsetWidth / 2; }
+    const r0 = Math.min(vw, s.h) * 0.15;
+    const rMax = Math.hypot(vw, s.h) / 2 + 4;
+    const g = ease(seg(p, 0.02, 0.5));
+    const r = r0 + (rMax - r0) * g;
+    // disc scales up from the button; the photo counter-scales so only the circle grows
+    const k = r / s.half;
+    const gl = seg(p, 0, 0.12);
+    const ld = seg(p, 0, 0.1);
+    const c = easeOut(seg(p, 0.45, 0.65));
+    return {
+      portal: { transform: `scale(${k.toFixed(5)})` },
+      photo: { transform: `scale(${((1.25 - 0.25 * g) / k).toFixed(5)})` },
+      tint: { opacity: (1 - seg(p, 0.06, 0.4)).toFixed(3) },
+      ring: { transform: `scale(${(r / r0).toFixed(4)})`, opacity: (1 - seg(p, 0.04, 0.28)).toFixed(3) },
+      glyph: { transform: `scale(${(1 + gl * 0.5).toFixed(3)})`, opacity: (1 - gl).toFixed(3) },
+      lead: { transform: `translateY(${(-ld * 48).toFixed(1)}px)`, opacity: (1 - ld).toFixed(3) },
+      scrim: { opacity: seg(p, 0.35, 0.62).toFixed(3) },
+      copy: { transform: `translateY(${((1 - c) * 48).toFixed(1)}px)`, opacity: c.toFixed(3), visibility: c > 0.01 ? 'visible' : 'hidden' },
+    };
+  };
+
+  // event page hero: the photo frame opens out to full bleed
+  const frameParts = (el) => (el._s ||= {
+    stage: el.querySelector('.ev-hero__stage'),
+    media: el.querySelector('.ev-hero__media'),
+    img: el.querySelector('.ev-hero__img'),
+    copy: el.querySelector('.ev-hero__copy'),
+  });
+  const frameAt = (p, s) => {
+    if (s.vw !== vw) { s.vw = vw; s.h = s.stage.offsetHeight || vh; s.head = headH(); }
+    const e = ease(seg(p, 0, 0.6));
+    const k = 1 - e;
+    const H = s.h, W0 = vw + 20, H0 = H + 20;
+    // the window the photo shows through, inset from the stage while k > 0
+    const top = k * (s.head + H * 0.03), bottom = H - k * H * 0.06;
+    const sx = (vw * (1 - 0.1 * k)) / W0, sy = (bottom - top) / H0;
+    const dy = (top + bottom - H) / 2;
+    const zoom = 1.12 - 0.12 * e;
+    return {
+      media: { transform: `translate3d(0,${dy.toFixed(2)}px,0) scale(${sx.toFixed(5)},${sy.toFixed(5)})` },
+      // undo the frame's scale and shift so the photo itself holds still
+      img: { transform: `scale(${(1 / sx).toFixed(5)},${(1 / sy).toFixed(5)}) translate3d(0,${(-dy).toFixed(2)}px,0) scale(${zoom.toFixed(4)})` },
+      copy: { transform: `translate3d(0,${(-seg(p, 0.5, 1) * 40).toFixed(1)}px,0)` },
+    };
+  };
+
   const handlers = {
     hero(el, p) {
-      const s = (el._s ||= {
-        portal: el.querySelector('.hero__portal'),
-        photo: el.querySelector('.hero__photo'),
-        tint: el.querySelector('.hero__tint'),
-        ring: el.querySelector('.hero__ring'),
-        glyph: el.querySelector('.hero__glyph'),
-        lead: el.querySelector('.hero__lead'),
-        scrim: el.querySelector('.hero__scrim'),
-        copy: el.querySelector('.hero__copy'),
-      });
-      const r0 = Math.min(vw, vh) * 0.15;
-      const rMax = Math.hypot(vw, vh) / 2 + 4;
-      const g = ease(seg(p, 0.02, 0.5));
-      const r = r0 + (rMax - r0) * g;
-      s.portal.style.clipPath = `circle(${r.toFixed(1)}px at 50% 50%)`;
-      s.photo.style.transform = `scale(${(1.25 - 0.25 * g).toFixed(4)})`;
-      s.tint.style.opacity = (1 - seg(p, 0.06, 0.4)).toFixed(3);
-      const ringScale = r / r0;
-      s.ring.style.transform = `scale(${ringScale.toFixed(4)})`;
-      s.ring.style.opacity = (1 - seg(p, 0.04, 0.28)).toFixed(3);
-      const gl = seg(p, 0, 0.12);
-      s.glyph.style.opacity = (1 - gl).toFixed(3);
-      s.glyph.style.transform = `scale(${(1 + gl * 0.5).toFixed(3)})`;
-      const ld = seg(p, 0, 0.1);
-      s.lead.style.opacity = (1 - ld).toFixed(3);
-      s.lead.style.transform = `translateY(${(-ld * 48).toFixed(1)}px)`;
-      const c = easeOut(seg(p, 0.45, 0.65));
-      s.scrim.style.opacity = seg(p, 0.35, 0.62).toFixed(3);
-      s.copy.style.opacity = c.toFixed(3);
-      s.copy.style.transform = `translateY(${((1 - c) * 48).toFixed(1)}px)`;
-      s.copy.style.visibility = c > 0.01 ? 'visible' : 'hidden';
+      const s = heroParts(el);
+      const v = heroAt(p, s);
+      for (const k in v) Object.assign(s[k].style, v[k]);
     },
 
     words(el, p) {
@@ -139,13 +172,9 @@
     },
 
     frame(el, p) {
-      const s = (el._s ||= { media: el.querySelector('.ev-hero__media'), img: el.querySelector('.ev-hero__img'), copy: el.querySelector('.ev-hero__copy') });
-      const e = ease(seg(p, 0, 0.6));
-      const k = 1 - e;
-      const head = headH();
-      s.media.style.clipPath = `inset(${(k * (head + vh * 0.03)).toFixed(1)}px ${(k * vw * 0.05).toFixed(1)}px ${(k * vh * 0.06).toFixed(1)}px round ${(k * 28).toFixed(1)}px)`;
-      s.img.style.transform = `scale(${(1.12 - 0.12 * e).toFixed(4)})`;
-      s.copy.style.transform = `translateY(${(-seg(p, 0.5, 1) * 40).toFixed(1)}px)`;
+      const s = frameParts(el);
+      const v = frameAt(p, s);
+      for (const k in v) Object.assign(s[k].style, v[k]);
     },
   };
 
@@ -259,10 +288,51 @@
     }
   };
 
+  // Where the browser supports scroll-driven animations, the hero and the events track are handed to it:
+  // they then run on the compositor in step with the finger instead of trailing the scroll on the main thread.
+  const timelines = motion && typeof ViewTimeline === 'function' && CSS.supports('animation-range: contain 0% contain 100%');
+  const baked = new Set();
+  let bakedAnims = [];
+  const bake = () => {
+    if (!timelines) return;
+    bakedAnims.forEach((a) => a.cancel());
+    bakedAnims = [];
+    const run = (target, keyframes, subject) => bakedAnims.push(target.animate(keyframes, {
+      timeline: new ViewTimeline({ subject }), rangeStart: 'contain 0%', rangeEnd: 'contain 100%', fill: 'both', easing: 'linear',
+    }));
+    for (const el of scenes) {
+      if (el.dataset.scene === 'hero') {
+        const s = heroParts(el);
+        const N = 48;
+        const samples = Array.from({ length: N + 1 }, (_, i) => heroAt(i / N, s));
+        for (const k in samples[0]) {
+          run(s[k], samples.map((v, i) => {
+            const { visibility, ...rest } = v[k];
+            return { ...rest, offset: i / N };
+          }), el);
+        }
+        // visibility is discrete; keep it in its own animation so the rest stays on the compositor
+        run(s.copy, [{ visibility: 'hidden', offset: 0 }, { visibility: 'hidden', offset: 0.45 }, { visibility: 'visible', offset: 0.4501 }, { visibility: 'visible', offset: 1 }], el);
+        baked.add(el);
+      } else if (el.dataset.scene === 'frame') {
+        const s = frameParts(el);
+        const N = 32;
+        const samples = Array.from({ length: N + 1 }, (_, i) => frameAt(i / N, s));
+        for (const k in samples[0]) run(s[k], samples.map((v, i) => ({ ...v[k], offset: i / N })), el);
+        baked.add(el);
+      } else if (el.dataset.scene === 'track') {
+        const s = el._s;
+        run(s.track, [{ transform: 'translate3d(0,0,0)' }, { transform: `translate3d(${-s.dist}px,0,0)` }], el);
+        baked.add(el);
+      }
+    }
+  };
+
   let ticking = false;
   const frame = () => {
     ticking = false;
     for (const el of scenes) {
+      if (baked.has(el)) continue;
       const { p, visible } = progress(el);
       if (visible || el._s === undefined) handlers[el.dataset.scene]?.(el, p);
     }
@@ -280,15 +350,17 @@
 
   if (motion) {
     sizeTracks();
+    bake();
     frame();
     addEventListener('scroll', request, { passive: true });
     addEventListener('resize', () => {
       const widthChanged = innerWidth !== vw;
       vw = innerWidth; vh = innerHeight;
-      if (widthChanged) sizeTracks();
+      // mobile toolbars fire resize while scrolling; only rebuild the timelines when the layout really changes
+      if (widthChanged) { sizeTracks(); bake(); }
       request();
     });
-    addEventListener('load', () => { sizeTracks(); request(); });
+    addEventListener('load', () => { sizeTracks(); bake(); request(); });
   }
 
   /* ---------- one source list: active service follows scroll ---------- */

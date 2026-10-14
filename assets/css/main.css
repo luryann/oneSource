@@ -339,8 +339,18 @@ body.menu-open { overflow: hidden; }
 
 .motion .hero { height: 250vh; }
 .motion .hero__stage { position: sticky; top: 0; height: 100vh; height: 100lvh; min-height: 0; }
-.motion .hero__portal { clip-path: circle(15vmin at 50% 50%); will-change: clip-path; }
-.motion .hero__photo { transform: scale(1.25); }
+/* the opening circle is a round disc scaled on the compositor (animating clip-path repaints every frame on mobile);
+   150vmax covers the viewport diagonal, and the photo inside is counter-scaled so it stays put */
+.motion .hero__portal {
+  inset: auto; left: 50%; top: 50%;
+  width: 150vmax; height: 150vmax; translate: -50% -50%;
+  border-radius: 50%; overflow: hidden;
+  transform: scale(0.1); will-change: transform;
+}
+.motion .hero__photo {
+  inset: auto; left: 50%; top: 50%;
+  width: 100vw; height: 100lvh; translate: -50% -50%;
+}
 .motion .hero__tint { opacity: 1; }
 .motion .hero__ring {
   display: block; position: absolute; left: 50%; top: 50%;
@@ -367,7 +377,8 @@ body.menu-open { overflow: hidden; }
 .motion .hero__ring circle { stroke-dasharray: 1 2; stroke-dashoffset: 1; animation: draw 1.3s var(--ease) 0.35s forwards, solid 0s 1.65s forwards; }
 .motion .hero__glyph path { stroke-dasharray: 1 2; stroke-dashoffset: 1; animation: draw 0.9s var(--ease) 0.75s forwards, solid 0s 1.65s forwards; }
 .motion .hero__glyph path + path { animation-delay: 0.95s, 1.85s; }
-.motion .hero__lead { animation: rise 1s var(--ease) 1.2s backwards; }
+/* on the inner span: the lead itself is driven by scroll, and a scroll animation would override this one */
+.motion .hero__lead > span { display: block; animation: rise 1s var(--ease) 1.2s backwards; }
 .motion .page-home .site-head { animation: fade 0.8s ease 0.6s both; }
 @keyframes disc-on { from { opacity: 0; transform: scale(0.82); } }
 @keyframes draw { to { stroke-dashoffset: 0; } }
@@ -602,7 +613,12 @@ body.menu-open { overflow: hidden; }
 
 .motion .ev-hero { height: 210vh; }
 .motion .ev-hero__stage { position: sticky; top: 0; height: 100vh; min-height: 0; }
-.motion .ev-hero__media { clip-path: inset(calc(var(--head-h) + 3vh) 5vw 6vh round 28px); will-change: clip-path; }
+/* the frame is a rounded box scaled on the compositor (animating clip-path repaints the photo every frame on mobile);
+   it overhangs the stage by 10px so its corners are off-screen once it reaches full bleed */
+.motion .ev-hero__media {
+  inset: -10px; border-radius: 28px; overflow: hidden;
+  transform: translateY(calc((var(--head-h) - 3vh) / 2)) scale(0.9, 0.84); will-change: transform;
+}
 .motion .ev-hero__img { transform: scale(1.12); will-change: transform; }
 .motion .ev-hero__copy { padding-inline: calc(var(--gutter) + 5vw); padding-bottom: calc(6vh + clamp(32px, 6vh, 64px)); }
 
